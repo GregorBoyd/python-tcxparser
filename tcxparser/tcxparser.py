@@ -194,7 +194,7 @@ class TCXParser:
         # convert counts to percentages
         nr_hr_values = len(hr_values)
         for name, count in per_zone.items():
-            per_zone[name] = round(100 * count / nr_hr_values)
+            per_zone[name] = round(100 * count / nr_hr_values, 2)
         return per_zone
 
     def hr_time_in_zones(self, zones):
