@@ -24,7 +24,13 @@ class TCXParser:
                 "//ns:HeartRateBpm/ns:Value", namespaces={"ns": namespace}
             )
         ]
-
+        
+    def pace_values(self):
+        return [
+            1000/(float(x.text) * 60)
+            for x in self.root.xpath("//ns:TPX/ns:Speed", namespaces={"ns": namespace2})
+        ]
+  
     def altitude_points(self):
         return [
             float(x.text)
@@ -228,7 +234,39 @@ class TCXParser:
                     per_zone[zone_name] += td
 
         return per_zone
+    
+    def pace_time_in_zones(self, zones):
+        """Time spent in each pace zone.
 
+        Given these user's pace zones:
+        zones = {
+            "paceZ0": (0, 4),
+            "paceZ1": (4, 5),
+            "paceZ2": (5, 10),
+        }
+
+        Then `self.pace_time_in_zones(zones)` would return something like:
+        {
+            "paceZ0": timedelta(seconds=3600),
+            "paceZ1": timedelta(seconds=1800),
+            "paceZ2": timedelta(seconds=300),
+        }
+        """
+        pace_values = self.pace_values()
+        if not pace_values:
+            print("no pace error")
+
+        # Initialize a dictionary with time=0 for each zone
+        per_zone = dict.fromkeys(zones.keys(), timedelta(0))
+
+        # count number of HR measurements per zone
+        for pace, td in zip(pace_values, self.time_durations()):
+            for zone_name, zone_boundaries in zones.items():
+                if pace >= zone_boundaries[0] and pace <= zone_boundaries[1]:
+                    per_zone[zone_name] += td
+
+        return per_zone
+    
     @property
     def pace(self):
         """Average pace (mm:ss/km for the workout"""
