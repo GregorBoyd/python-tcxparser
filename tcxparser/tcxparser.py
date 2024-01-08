@@ -27,7 +27,7 @@ class TCXParser:
         
     def pace_values(self):
         return [
-            1000/(float(x.text) * 60) if float(x.text) > 0 else None
+            1000/(float(x.text) * 60) if float(x.text) > 0 else float('inf')
             for x in self.root.xpath("//ns:TPX/ns:Speed", namespaces={"ns": namespace2})
         ]
   
