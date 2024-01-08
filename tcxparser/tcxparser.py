@@ -262,7 +262,7 @@ class TCXParser:
         # count number of HR measurements per zone
         for pace, td in zip(pace_values, self.time_durations()):
             for zone_name, zone_boundaries in zones.items():
-                if pace >= zone_boundaries[0] and pace <= zone_boundaries[1]:
+                if pace > zone_boundaries[0] and pace <= zone_boundaries[1]:
                     per_zone[zone_name] += td
 
         return per_zone
